@@ -58,7 +58,11 @@ project-root/
 ```bash
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers
 ```
+or
 
+```bash
+pip install -U -r requirements.txt
+```
 ---
 
 ### 2. Settings Configuration
