@@ -93,125 +93,12 @@ SIMPLE_JWT = {
 }
 ```
 
----
-
-### 4. Login View (Set Cookies)
-
-```python
-class LoginView(TokenObtainPairView):
-    serializer_class = LoginSerializer
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-
-        data = response.data
-        access = data.get("access")
-        refresh = data.get("refresh")
-
-        response.set_cookie(
-            key="access_token",
-            value=access,
-            httponly=True,
-            secure=False,  # True in production
-            samesite="Lax"
-        )
-
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh,
-            httponly=True,
-            secure=False,
-            samesite="Lax"
-        )
-
-        return response
-```
-
----
-
-### 5. Logout View
-
-```python
-class LogoutView(APIView):
-    def post(self, request):
-        response = Response({"message": "Logged out"})
-
-        response.delete_cookie("access_token")
-        response.delete_cookie("refresh_token")
-
-        return response
-```
-
----
-
-### 6. Authentication Class (Cookie-based)
-
-```python
-from rest_framework_simplejwt.authentication import JWTAuthentication
-
-class CookieJWTAuthentication(JWTAuthentication):
-    def authenticate(self, request):
-        token = request.COOKIES.get("access_token")
-
-        if not token:
-            return None
-
-        validated_token = self.get_validated_token(token)
-        user = self.get_user(validated_token)
-
-        return (user, validated_token)
-```
-
----
-
 ## ⚛️ Frontend Setup (React)
 
-### 1. Install Axios
+### 1. Install Packages
 
 ```bash
-npm install axios
-```
-
----
-
-### 2. Axios Configuration
-
-```javascript
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: "http://localhost:8000",
-  withCredentials: true, // VERY IMPORTANT
-});
-
-export default api;
-```
-
----
-
-### 3. Login Request
-
-```javascript
-await api.post("/api/login/", {
-  email,
-  password,
-});
-```
-
----
-
-### 4. Logout Request
-
-```javascript
-await api.post("/api/logout/");
-```
-
----
-
-### 5. Protected Requests
-
-```javascript
-await api.get("/api/protected/");
+npm install
 ```
 
 Cookies are automatically sent because of `withCredentials: true`.
@@ -245,7 +132,7 @@ Cookies are automatically sent because of `withCredentials: true`.
 
 ```
 DEBUG=True
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://localhost:3000
 ```
 
 ### Frontend
@@ -295,23 +182,6 @@ npm run dev
 
 * Ensure `CSRF_TRUSTED_ORIGINS` is set
 * Send CSRF token if needed
-
----
-
-## 📌 Future Improvements
-
-* Refresh token rotation
-* Blacklisting tokens
-* Social login (Google, etc.)
-* Role-based permissions
-* Rate limiting (e.g. django-axes)
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome. For major changes, please open an issue first.
-
 ---
 
 ## 📄 License
